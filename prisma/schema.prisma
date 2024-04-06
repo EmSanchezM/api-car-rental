@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id Int @id @default(autoincrement())
+  fistName String 
+  lastName String
+  gender String
+  age Int
+  contactAddress Json
+  email String @unique
+  password String
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id Int @id @default(autoincrement())
+  fistName String 
+  lastName String
+  gender String
+  age Int
+  contactAddress Json
+  email String @unique
+  password String
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Car {
+  id Int @id @default(autoincrement())
+  carNumber Int
+  carModel String
+  carStatus String
+  rentPrize Float
+  driver Json
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rental {
+  id Int @id @default(autoincrement())
+  rentalNumber Int
+  rentalDate DateTime
+  departureTime DateTime //Hora de salida
+  arrivalTime DateTime //Hora de llegada
+  LodgingDate DateTime //Fecha de alojamiento
+  returnDate DateTime //Fecha de regreso
+  payment Float
+  transactions Transaction[]
+  reports Report[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+  transactionName String
+  transactionDate DateTime
+  rentalId Int
+  rental Rental @relation(fields: [rentalId], references: [id])
+  carId Int
+  car Car @relation(fields: [carId], references: [id])
+  customerId Int
+  customer Customer @relation(fields: [customerId], references: [id])
+  adminId Int?
+  admin Admin? @relation(fields: [adminId], references: [id])
+  reports Report[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id Int @id @default(autoincrement())
+  reportDate DateTime
+  transactionId Int
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+  rentalId Int
+  rental Rental @relation(fields: [rentalId], references: [id])
+}
