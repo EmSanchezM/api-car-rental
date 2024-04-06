@@ -1,24 +1,24 @@
-import { IsDate, IsNumber, IsPositive } from 'class-validator';
+import { IsISO8601, IsNumber, IsPositive } from 'class-validator';
 
 export class CreateRentalDto {
   @IsNumber()
   @IsPositive()
   rentalNumber: number;
 
-  @IsDate()
-  rentalDate: Date;
+  @IsISO8601({ strict: true })
+  rentalDate: string;
 
-  @IsDate()
-  departureTime: Date;
+  @IsISO8601({ strict: true })
+  departureTime: string;
 
-  @IsDate()
-  arrivalTime: Date;
+  @IsISO8601({ strict: true })
+  arrivalTime: string;
 
-  @IsDate()
-  lodgingDate: Date;
+  @IsISO8601({ strict: true })
+  lodgingDate: string;
 
-  @IsDate()
-  returnDate: Date;
+  @IsISO8601({ strict: true })
+  returnDate: string;
 
   @IsNumber()
   @IsPositive()
