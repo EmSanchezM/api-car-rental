@@ -59,7 +59,7 @@ model Rental {
   rentalDate DateTime
   departureTime DateTime //Hora de salida
   arrivalTime DateTime //Hora de llegada
-  LodgingDate DateTime //Fecha de alojamiento
+  lodgingDate DateTime //Fecha de alojamiento
   returnDate DateTime //Fecha de regreso
   payment Float
   transactions Transaction[]
