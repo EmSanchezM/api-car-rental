@@ -46,6 +46,7 @@ export class CarService {
           carNumber: true,
           carStatus: true,
           rentPrize: true,
+          driver: true,
           createdAt: true,
         },
       }),
