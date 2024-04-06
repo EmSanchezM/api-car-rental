@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCarDto, UpdateCarDto } from './dto';
 import { PrismaService } from 'src/orm';
 
@@ -10,34 +6,27 @@ import { PrismaService } from 'src/orm';
 export class CarService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createCarDto: CreateCarDto) {
-    try {
-      const { carModel, carNumber, carStatus, rentPrize, driver } =
-        createCarDto;
+  create(createCarDto: CreateCarDto) {
+    const { carModel, carNumber, carStatus, rentPrize, driver } = createCarDto;
 
-      const car = await this.prisma.car.create({
-        data: {
-          carModel,
-          carNumber,
-          carStatus,
-          rentPrize,
-          driver: {
-            ...driver,
-          },
+    return this.prisma.car.create({
+      data: {
+        carModel,
+        carNumber,
+        carStatus,
+        rentPrize,
+        driver: {
+          ...driver,
         },
-        select: {
-          id: true,
-          carModel: true,
-          carNumber: true,
-          carStatus: true,
-          rentPrize: true,
-        },
-      });
-
-      return car;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+      },
+      select: {
+        id: true,
+        carModel: true,
+        carNumber: true,
+        carStatus: true,
+        rentPrize: true,
+      },
+    });
   }
 
   findAll() {
@@ -45,73 +34,61 @@ export class CarService {
   }
 
   async findOne(id: number) {
-    try {
-      const car = this.prisma.car.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          carModel: true,
-          carNumber: true,
-          carStatus: true,
-          rentPrize: true,
-        },
-      });
+    const car = await this.prisma.car.findFirst({
+      where: { id },
+      select: {
+        id: true,
+        carModel: true,
+        carNumber: true,
+        carStatus: true,
+        rentPrize: true,
+      },
+    });
 
-      if (!car) throw new NotFoundException('Car not found');
+    if (!car) throw new NotFoundException('Car not found');
 
-      return car;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    return car;
   }
 
   async update(id: number, updateCarDto: UpdateCarDto) {
-    try {
-      const { carModel, carNumber, carStatus, rentPrize } = updateCarDto;
+    const { carModel, carNumber, carStatus, rentPrize } = updateCarDto;
 
-      const car = await this.prisma.car.findUnique({ where: { id } });
+    const car = await this.prisma.car.findUnique({ where: { id } });
 
-      if (!car) throw new NotFoundException('Car not found');
+    if (!car) throw new NotFoundException('Car not found');
 
-      return this.prisma.car.update({
-        data: {
-          carModel,
-          carNumber,
-          carStatus,
-          rentPrize,
-        },
-        where: { id },
-        select: {
-          id: true,
-          carModel: true,
-          carNumber: true,
-          carStatus: true,
-          rentPrize: true,
-        },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    return this.prisma.car.update({
+      data: {
+        carModel,
+        carNumber,
+        carStatus,
+        rentPrize,
+      },
+      where: { id },
+      select: {
+        id: true,
+        carModel: true,
+        carNumber: true,
+        carStatus: true,
+        rentPrize: true,
+      },
+    });
   }
 
   async remove(id: number) {
-    try {
-      const car = await this.prisma.car.findUnique({ where: { id } });
+    const car = await this.prisma.car.findUnique({ where: { id } });
 
-      if (!car) throw new NotFoundException('Car not found');
+    if (!car) throw new NotFoundException('Car not found');
 
-      return this.prisma.car.delete({
-        where: { id },
-        select: {
-          id: true,
-          carModel: true,
-          carNumber: true,
-          carStatus: true,
-          rentPrize: true,
-        },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    return this.prisma.car.delete({
+      where: { id },
+      select: {
+        id: true,
+        carModel: true,
+        carNumber: true,
+        carStatus: true,
+        rentPrize: true,
+      },
+    });
   }
 }
