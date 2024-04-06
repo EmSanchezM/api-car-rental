@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Customer {
+model User {
   id Int @id @default(autoincrement())
   fistName String 
   lastName String
@@ -22,21 +22,17 @@ model Customer {
   contactAddress Json
   email String @unique
   password String
+  roles Role[]
   transactions Transaction[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Admin {
+model Role {
   id Int @id @default(autoincrement())
-  fistName String 
-  lastName String
-  gender String
-  age Int
-  contactAddress Json
-  email String @unique
-  password String
-  transactions Transaction[]
+  name String
+  userId Int
+  user User @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -76,10 +72,8 @@ model Transaction {
   rental Rental @relation(fields: [rentalId], references: [id])
   carId Int
   car Car @relation(fields: [carId], references: [id])
-  customerId Int
-  customer Customer @relation(fields: [customerId], references: [id])
-  adminId Int?
-  admin Admin? @relation(fields: [adminId], references: [id])
+  userId Int
+  user User @relation(fields: [userId], references: [id])
   reports Report[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
