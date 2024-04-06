@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { RentalsService } from './rentals.service';
 import { CreateRentalDto, UpdateRentalDto } from './dto';
+import { PaginationDto } from 'src/common';
 
 @Controller('rentals')
 export class RentalsController {
@@ -20,8 +21,8 @@ export class RentalsController {
   }
 
   @Get()
-  findAll() {
-    return this.rentalsService.findAll();
+  findAll(@Param() pagination: PaginationDto) {
+    return this.rentalsService.findAll(pagination);
   }
 
   @Get(':id')

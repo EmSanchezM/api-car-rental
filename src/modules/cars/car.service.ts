@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCarDto, UpdateCarDto } from './dto';
 import { PrismaService } from 'src/orm';
+import { PaginationDto } from 'src/common';
 
 @Injectable()
 export class CarService {
@@ -29,8 +30,23 @@ export class CarService {
     });
   }
 
-  findAll() {
-    return this.prisma.car.findMany();
+  async findAll(pagination: PaginationDto) {
+    const { page, limit } = pagination;
+
+    const totalPages = await this.prisma.car.count();
+    const lastPage = Math.ceil(totalPages / limit);
+
+    return {
+      data: await this.prisma.car.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      meta: {
+        total: totalPages,
+        page,
+        lastPage,
+      },
+    };
   }
 
   async findOne(id: number) {

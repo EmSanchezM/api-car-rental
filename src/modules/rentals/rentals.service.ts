@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRentalDto, UpdateRentalDto } from './dto';
 import { PrismaService } from 'src/orm';
+import { PaginationDto } from 'src/common';
 
 @Injectable()
 export class RentalsService {
@@ -12,19 +13,33 @@ export class RentalsService {
     });
   }
 
-  findAll() {
-    return this.prisma.rental.findMany({
-      select: {
-        id: true,
-        rentalDate: true,
-        rentalNumber: true,
-        returnDate: true,
-        arrivalTime: true,
-        departureTime: true,
-        lodgingDate: true,
-        payment: true,
+  async findAll(pagination: PaginationDto) {
+    const { page, limit } = pagination;
+
+    const totalPages = await this.prisma.rental.count();
+    const lastPage = Math.ceil(totalPages / limit);
+
+    return {
+      data: await this.prisma.rental.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          id: true,
+          rentalDate: true,
+          rentalNumber: true,
+          returnDate: true,
+          arrivalTime: true,
+          departureTime: true,
+          lodgingDate: true,
+          payment: true,
+        },
+      }),
+      meta: {
+        total: totalPages,
+        page,
+        lastPage,
       },
-    });
+    };
   }
 
   async findOne(id: number) {

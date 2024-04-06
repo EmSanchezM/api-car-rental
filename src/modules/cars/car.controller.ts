@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { CreateCarDto, UpdateCarDto } from './dto';
+import { PaginationDto } from 'src/common';
 
 @Controller('cars')
 export class CarController {
@@ -20,8 +21,8 @@ export class CarController {
   }
 
   @Get()
-  findAll() {
-    return this.carService.findAll();
+  findAll(@Param() pagination: PaginationDto) {
+    return this.carService.findAll(pagination);
   }
 
   @Get(':id')
