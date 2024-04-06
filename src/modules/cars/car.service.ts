@@ -40,6 +40,14 @@ export class CarService {
       data: await this.prisma.car.findMany({
         skip: (page - 1) * limit,
         take: limit,
+        select: {
+          id: true,
+          carModel: true,
+          carNumber: true,
+          carStatus: true,
+          rentPrize: true,
+          createdAt: true,
+        },
       }),
       meta: {
         total: totalPages,
