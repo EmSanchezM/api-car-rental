@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRentalDto, UpdateRentalDto } from './dto';
-import { PrismaService } from 'src/orm';
+import { PrismaService } from 'src/orm/orm.service';
 import { PaginationDto } from 'src/common';
 
 @Injectable()
