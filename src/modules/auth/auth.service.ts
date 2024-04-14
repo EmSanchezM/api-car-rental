@@ -2,9 +2,9 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-import { SignInAuthDto, SignUpAuthDto } from './dto';
 import { PrismaService } from 'src/orm/orm.service';
 import { comparePasswordAndHash, generateFromPassword } from 'src/common';
+import { SignInAuthDto, SignUpAuthDto } from './dto';
 import { AuthTokens, JwtPayload } from './types';
 
 @Injectable()
@@ -42,6 +42,9 @@ export class AuthService {
             connect: availableRoles.map((role) => ({ id: role.id })),
           },
         },
+        include: {
+          roles: true,
+        },
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
@@ -52,7 +55,9 @@ export class AuthService {
         throw error;
       });
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const rolesToken = user.roles.map((role) => role.name);
+
+    const tokens = await this.getTokens(user.id, user.email, rolesToken);
     await this.updateRefreshTokenHash(user.id, tokens.refresh_token);
 
     return tokens;
@@ -62,6 +67,9 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: {
         email: signInAuthDto.email,
+      },
+      include: {
+        roles: true,
       },
     });
 
@@ -74,7 +82,9 @@ export class AuthService {
 
     if (!passwordMatches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const roles = user.roles.map((role) => role.name);
+
+    const tokens = await this.getTokens(user.id, user.email, roles);
     await this.updateRefreshTokenHash(user.id, tokens.refresh_token);
 
     return tokens;
@@ -104,6 +114,9 @@ export class AuthService {
       where: {
         id: userId,
       },
+      include: {
+        roles: true,
+      },
     });
 
     if (!user || !user.refreshToken)
@@ -116,16 +129,23 @@ export class AuthService {
 
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const roles = user.roles.map((role) => role.name);
+
+    const tokens = await this.getTokens(user.id, user.email, roles);
     await this.updateRefreshTokenHash(user.id, tokens.refresh_token);
 
     return tokens;
   }
 
-  async getTokens(userId: number, email: string): Promise<AuthTokens> {
+  async getTokens(
+    userId: number,
+    email: string,
+    roles: string[],
+  ): Promise<AuthTokens> {
     const jwtPayload: JwtPayload = {
       sub: userId,
       email: email,
+      roles,
     };
 
     const [accessToken, refreshToken] = await Promise.all([
