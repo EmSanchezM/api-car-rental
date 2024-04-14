@@ -137,6 +137,34 @@ export class AuthService {
     return tokens;
   }
 
+  async getProfileUser(userId: number) {
+    const user = this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        gender: true,
+        age: true,
+        contactAddress: true,
+        roles: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        createdAt: true,
+      },
+    });
+
+    if (!user) throw new ForbiddenException('Access Denied');
+
+    return user;
+  }
+
   async getTokens(
     userId: number,
     email: string,

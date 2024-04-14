@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInAuthDto, SignUpAuthDto } from './dto';
 import { GetCurrentUser, GetCurrentUserId, Public } from './decorators';
@@ -33,5 +33,10 @@ export class AuthController {
     @GetCurrentUser('refreshToken') refreshToken: string,
   ) {
     return this.authService.refreshTokens(userId, refreshToken);
+  }
+
+  @Get('me')
+  getProfile(@GetCurrentUserId() userId: number) {
+    return this.authService.getProfileUser(userId);
   }
 }
